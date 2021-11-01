@@ -7,10 +7,10 @@ using Rocket.CodeAnalysis;
 
 namespace Rocket
 {
-    class Program
+    internal static class Program
     {
 
-        static void Main(string[] args)
+        private static void Main()
         {
             bool showTree = false;
 
@@ -33,10 +33,9 @@ namespace Rocket
                 var syntaxTree = SyntaxTree.Parse(line);
 
                 if (showTree) {
-                    var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     PrettyPrint(syntaxTree.Root);
-                    Console.ForegroundColor = color;
+                    Console.ResetColor();
                 }
 
                 if (!syntaxTree.Diagnostics.Any()) {
@@ -44,14 +43,11 @@ namespace Rocket
                     var result = e.Evaluate();
                     Console.WriteLine(result);
                 } else {
-                    var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-
                     foreach (var diagnostic in syntaxTree.Diagnostics) {
                         Console.WriteLine(diagnostic);
                     }
-
-                    Console.ForegroundColor = color;
+                    Console.ResetColor();
                 }
             }
         }
@@ -70,7 +66,7 @@ namespace Rocket
 
             Console.WriteLine();
 
-            indent += isLast ? "    " : "│   ";
+            indent += isLast ? "   " : "│   ";
 
             var lastChild = node.GetChildren().LastOrDefault();
 

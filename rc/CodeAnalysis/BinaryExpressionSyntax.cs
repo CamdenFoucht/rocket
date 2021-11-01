@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Rocket.CodeAnalysis
 {
-    sealed class BinaryExpressionSyntax : ExpressionSyntax {
+   public sealed class BinaryExpressionSyntax : ExpressionSyntax {
         public BinaryExpressionSyntax(ExpressionSyntax left, SyntaxToken operatorToken, ExpressionSyntax right) {
             Left = left;
             OperatorToken = operatorToken;

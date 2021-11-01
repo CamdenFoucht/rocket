@@ -1,22 +1,22 @@
 namespace Rocket.CodeAnalysis
 {
-    enum SyntaxKind {
-        NumberToken,
-        WhiteSpaceToken,
-        PlusToken,
-        MinusToken,
-        OpenParanthesisToken,
-        CloseParenthesisToken,
-        SlashToken,
-        StarToken,
+    public enum SyntaxKind {
+        // Tokens
         BadToken,
         EndOfFileToken,
+        WhiteSpaceToken,
+        NumberToken,
+        PlusToken,
+        MinusToken,
+        SlashToken,
+        StarToken,
+        OpenParanthesisToken,
+        CloseParenthesisToken,
+
+        // Expressions
         NumberExpression,
         BinaryExpression,
         ParenthesizedExpression
     }
 }
-
-
-
 

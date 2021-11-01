@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Rocket.CodeAnalysis
 {
-    class Lexer {
+    internal sealed class Lexer {
         private readonly string _text;
         private int _position;
         private List<string> _diagnostics = new List<string>();
