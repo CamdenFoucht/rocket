@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Rocket.CodeAnalysis
+namespace Rocket.CodeAnalysis.Syntax
 {
     public abstract class SyntaxNode {
         public abstract SyntaxKind Kind { get; } 
@@ -8,7 +8,3 @@ namespace Rocket.CodeAnalysis
         public abstract IEnumerable<SyntaxNode> GetChildren();
     }
 }
-
-
-
-

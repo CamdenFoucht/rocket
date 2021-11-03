@@ -1,8 +1,4 @@
-namespace Rocket.CodeAnalysis
+namespace Rocket.CodeAnalysis.Syntax
 {
     public abstract class ExpressionSyntax : SyntaxNode { }
 }
-
-
-
-

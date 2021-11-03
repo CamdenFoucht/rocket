@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Rocket.CodeAnalysis
+namespace Rocket.CodeAnalysis.Syntax
 {
    public sealed class BinaryExpressionSyntax : ExpressionSyntax {
         public BinaryExpressionSyntax(ExpressionSyntax left, SyntaxToken operatorToken, ExpressionSyntax right) {
@@ -22,7 +22,3 @@ namespace Rocket.CodeAnalysis
         }
     }
 }
-
-
-
-

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Rocket.CodeAnalysis
+namespace Rocket.CodeAnalysis.Syntax
 {
     public sealed class SyntaxTree {
         public SyntaxTree(IEnumerable<string> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken) {
@@ -21,7 +21,3 @@ namespace Rocket.CodeAnalysis
         }
     }
 }
-
-
-
-

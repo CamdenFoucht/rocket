@@ -1,6 +1,16 @@
 using System.Collections.Generic;
 
-namespace Rocket.CodeAnalysis
+namespace Rocket.CodeAnalysis.Syntax
+
+// 
+// 
+//
+// +1
+// -1 * -3
+// -(3 + 3)
+//
+//
+
 {
     internal sealed class Parser {
 
@@ -17,7 +27,7 @@ namespace Rocket.CodeAnalysis
             SyntaxToken token;
 
             do {
-                token = lexer.NextToken();
+                token = lexer.Lex();
 
                 if (token.Kind != SyntaxKind.WhiteSpaceToken && token.Kind != SyntaxKind.BadToken) {
                     tokens.Add(token);
@@ -61,30 +71,26 @@ namespace Rocket.CodeAnalysis
             return new SyntaxTree(_diagnostics, expression, endOfFileToken);
         }
 
-        private ExpressionSyntax ParseExpression(){
-            return ParseTerm();
-        }
+        private ExpressionSyntax ParseExpression(int parentPrecedence = 0) {
+            ExpressionSyntax left;
 
-        public ExpressionSyntax ParseTerm() {
-            var left = ParseFactor();
+            var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
 
-            while (Current.Kind == SyntaxKind.PlusToken || 
-                   Current.Kind == SyntaxKind.MinusToken) {
+            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence) {
                 var operatorToken = NextToken();
-                var right = ParseFactor();
-                left = new BinaryExpressionSyntax(left, operatorToken, right);
+                var operand = ParseExpression(unaryOperatorPrecedence);
+                left = new UnaryExpressionSyntax(operatorToken, operand);
+            } else {
+                left = ParsePrimaryExpression();
             }
 
-            return left;
-        }
-
-        public ExpressionSyntax ParseFactor() {
-            var left = ParsePrimaryExpression();
-
-            while (Current.Kind == SyntaxKind.StarToken || 
-                   Current.Kind == SyntaxKind.SlashToken) {
+            while (true) {
+                var precedence = Current.Kind.GetBinaryOperatorPrecedence();
+                if (precedence == 0 || precedence <= parentPrecedence) {
+                    break;
+                }
                 var operatorToken = NextToken();
-                var right = ParsePrimaryExpression();
+                var right = ParseExpression(precedence);
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
             }
 
@@ -92,15 +98,31 @@ namespace Rocket.CodeAnalysis
         }
 
         private ExpressionSyntax ParsePrimaryExpression() {
+            switch (Current.Kind)
+            {
+                case SyntaxKind.OpenParanthesisToken:
+                    {
+                        var left = NextToken();
+                        var expression = ParseExpression();
+                        var right = MatchToken(SyntaxKind.CloseParenthesisToken);
+                        return new ParenthesizedExpressionSyntax(left, expression, right);
+                    }
 
-            if (Current.Kind == SyntaxKind.OpenParanthesisToken) {
-                var left = NextToken();
-                var expression = ParseExpression();
-                var right = MatchToken(SyntaxKind.CloseParenthesisToken);
-                return new ParenthesizedExpressionSyntax(left, expression, right);
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
+                    {
+                        var keywordToken = NextToken();
+                        var value = keywordToken.Kind == SyntaxKind.TrueKeyword;
+                        return new LiteralExpressionSyntax(keywordToken, value);
+                    }
+
+                default:
+                {
+                    var numberToken = MatchToken(SyntaxKind.NumberToken);
+                    return new LiteralExpressionSyntax(numberToken);
+
+                }
             }
-            var numberToken = MatchToken(SyntaxKind.NumberToken);
-            return new LiteralExpressionSyntax(numberToken);
         }
     }
 }

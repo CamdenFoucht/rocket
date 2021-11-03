@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Rocket.CodeAnalysis
+namespace Rocket.CodeAnalysis.Syntax
 {
     public sealed class ParenthesizedExpressionSyntax: ExpressionSyntax {
 
@@ -23,11 +23,6 @@ namespace Rocket.CodeAnalysis
             yield return Expression;
             yield return CloseParanthesisToken;
         }
-
-
     }
 }
-
-
-
 

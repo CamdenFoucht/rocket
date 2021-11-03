@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Rocket.CodeAnalysis
+namespace Rocket.CodeAnalysis.Syntax
 {
     public sealed class SyntaxToken : SyntaxNode{
         public SyntaxToken(SyntaxKind kind, int position, string text, object value) {
@@ -22,7 +22,3 @@ namespace Rocket.CodeAnalysis
         }
     }
 }
-
-
-
-
