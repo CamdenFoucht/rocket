@@ -1,65 +1,78 @@
 using System;
 using System.Collections.Generic;
+using Rocket.CodeAnalysis.Compilation;
 
 namespace Rocket.CodeAnalysis.Syntax
 {
-    internal sealed class Lexer {
+    internal sealed class Lexer
+    {
         private readonly string _text;
         private int _position;
-        private List<string> _diagnostics = new List<string>();
+        private DiagnosticBag _diagnostics = new DiagnosticBag();
 
-        public Lexer(string text) {
+        public Lexer(string text)
+        {
             _text = text;
         }
 
-        public IEnumerable<string> Diagnostic => _diagnostics;
+        public DiagnosticBag Diagnostic => _diagnostics;
 
-        private char Current  => Peek(0);
+        private char Current => Peek(0);
 
         private char Lookahead => Peek(1);
 
-        private char Peek(int offset) {
+        private char Peek(int offset)
+        {
             var index = _position + offset;
-            if (index >= _text.Length) {
-                 return '\0';
+            if (index >= _text.Length)
+            {
+                return '\0';
             }
             return _text[index];
         }
 
-        private void Next() {
+        private void Next()
+        {
             _position++;
         }
 
-        public SyntaxToken Lex() {
+        public SyntaxToken Lex()
+        {
             // <numbers>
             // + - * / ()
             // whitespace
 
-            if (_position >= _text.Length) {
+            if (_position >= _text.Length)
+            {
                 return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
             }
 
-            if(Char.IsDigit(Current)) {
-                var start = _position;
+            var start = _position;
 
-                while (char.IsDigit(Current)) {
+
+            if (Char.IsDigit(Current))
+            {
+
+                while (char.IsDigit(Current))
+                {
                     Next();
                 }
 
                 var length = _position - start;
                 var text = _text.Substring(start, length);
 
-                if (!int.TryParse(text, out var value)) {
-                    _diagnostics.Add($"The number {_text} isn't a valid Int32");
+                if (!int.TryParse(text, out var value))
+                {
+                    _diagnostics.ReportInvalidNumber(new TextSpan(start, length), _text, typeof(int));
                 }
 
                 return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
             }
 
-            if (Char.IsWhiteSpace(Current)) {
-                var start = _position;
-
-                while (char.IsWhiteSpace(Current)) {
+            if (Char.IsWhiteSpace(Current))
+            {
+                while (char.IsWhiteSpace(Current))
+                {
                     Next();
                 }
 
@@ -68,10 +81,10 @@ namespace Rocket.CodeAnalysis.Syntax
                 return new SyntaxToken(SyntaxKind.WhiteSpaceToken, start, text, null);
             }
 
-            if (char.IsLetter(Current)) {
-                var start = _position;
-
-                while (char.IsLetter(Current)) {
+            if (char.IsLetter(Current))
+            {
+                while (char.IsLetter(Current))
+                {
                     Next();
                 }
 
@@ -96,25 +109,43 @@ namespace Rocket.CodeAnalysis.Syntax
                 case ')':
                     return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
                 case '&':
-                    if (Lookahead == '&')  
-                        return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, _position += 2, "&&", null);
+                    if (Lookahead == '&')
+                    {
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, start, "&&", null);
+                    }
                     break;
                 case '|':
-                    if (Lookahead == '|')  
-                        return new SyntaxToken(SyntaxKind.PipePipeToken, _position += 2, "||", null);
+                    if (Lookahead == '|')
+                    {
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.PipePipeToken, start, "||", null);
+                    }
                     break;
                 case '=':
-                    if (Lookahead == '=')  
-                        return new SyntaxToken(SyntaxKind.EqualsEqualToken, _position += 2, "==", null);
-                    break;
-                case '!':
-                    if (Lookahead == '=')  
-                        return new SyntaxToken(SyntaxKind.BangEqualsToken, _position += 2, "!=", null);
+                    if (Lookahead == '=')
+                    {
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.EqualsEqualToken, start, "==", null);
+                    }
                     else
+                    {
+                        _position += 1;
+                        return new SyntaxToken(SyntaxKind.EqualsToken, start, "=", null);
+                    }
+                case '!':
+                    if (Lookahead == '=')
+                    {
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.BangEqualsToken, start, "!=", null);
+                    }
+                    else
+                    {
                         return new SyntaxToken(SyntaxKind.BangToken, _position++, "!", null);
+                    }
             }
 
-            _diagnostics.Add($"ERROR: bad character input: '{Current}'");
+            _diagnostics.ReportBadCharacter(_position, Current);
             return new SyntaxToken(SyntaxKind.BadToken, _position++, _text.Substring(_position - 1, 1), null);
         }
 

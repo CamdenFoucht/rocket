@@ -2,8 +2,10 @@ using System.Collections.Generic;
 
 namespace Rocket.CodeAnalysis.Syntax
 {
-   public sealed class UnaryExpressionSyntax : ExpressionSyntax {
-        public UnaryExpressionSyntax(SyntaxToken operatorToken, ExpressionSyntax operand) {
+    public sealed class UnaryExpressionSyntax : ExpressionSyntax
+    {
+        public UnaryExpressionSyntax(SyntaxToken operatorToken, ExpressionSyntax operand)
+        {
             OperatorToken = operatorToken;
             Operand = operand;
         }
@@ -13,7 +15,8 @@ namespace Rocket.CodeAnalysis.Syntax
 
         public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
 
-        public override IEnumerable<SyntaxNode> GetChildren() {
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
             yield return OperatorToken;
             yield return Operand;
         }

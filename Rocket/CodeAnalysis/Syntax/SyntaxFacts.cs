@@ -2,8 +2,10 @@ namespace Rocket.CodeAnalysis.Syntax
 {
     internal static class SyntaxFacts
     {
-        public static int GetBinaryOperatorPrecedence(this SyntaxKind kind){
-            switch (kind) {
+        public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
+        {
+            switch (kind)
+            {
                 case SyntaxKind.StarToken:
                 case SyntaxKind.SlashToken:
                     return 5;
@@ -20,10 +22,12 @@ namespace Rocket.CodeAnalysis.Syntax
                 default:
                     return 0;
             }
-        }   
+        }
 
-        public static int GetUnaryOperatorPrecedence(this SyntaxKind kind){
-            switch (kind) {
+        public static int GetUnaryOperatorPrecedence(this SyntaxKind kind)
+        {
+            switch (kind)
+            {
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
                 case SyntaxKind.BangToken:
@@ -31,16 +35,18 @@ namespace Rocket.CodeAnalysis.Syntax
                 default:
                     return 0;
             }
-        }   
-        public static SyntaxKind GetKeywordKind(string text) {
+        }
+        public static SyntaxKind GetKeywordKind(string text)
+        {
 
-            switch(text) {
+            switch (text)
+            {
                 case "true":
                     return SyntaxKind.TrueKeyword;
                 case "false":
                     return SyntaxKind.FalseKeyword;
                 default:
-                return SyntaxKind.IdentifierToken;
+                    return SyntaxKind.IdentifierToken;
             }
         }
     }

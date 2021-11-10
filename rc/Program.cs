@@ -1,8 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System;
 using System.Linq;
 using Rocket.CodeAnalysis;
 using Rocket.CodeAnalysis.Syntax;
 using Rocket.CodeAnalysis.Binding;
+using Rocket.CodeAnalysis.Compilation;
 
 namespace Rocket
 {
@@ -12,57 +14,83 @@ namespace Rocket
         private static void Main()
         {
             bool showTree = false;
+            var variables = new Dictionary<VariableSymbol, object>();
 
-            while (true) {
+            while (true)
+            {
                 Console.Write("> ");
                 var line = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(line)) {
+                if (string.IsNullOrWhiteSpace(line))
+                {
                     return;
                 }
 
-                if (line == "#showTree") {
+                if (line == "#showTree")
+                {
                     showTree = !showTree;
                     Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees");
                     continue;
-                } else if (line == "#cls") {
+                }
+                else if (line == "#cls")
+                {
                     Console.Clear();
                     continue;
                 }
 
                 var syntaxTree = SyntaxTree.Parse(line);
-                var binder = new Binder();
-                var boundExpression = binder.BindExpression(syntaxTree.Root);
+                var compilation = new Compilation(syntaxTree);
+                var result = compilation.Evaluate(variables);
+                var diagnostics = result.Diagnostics;
 
-                var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
-
-                if (showTree) {
+                if (showTree)
+                {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     PrettyPrint(syntaxTree.Root);
                     Console.ResetColor();
                 }
 
-                if (!diagnostics.Any()) {
-                    var e = new Evaluator(boundExpression);
-                    var result = e.Evaluate();
-                    Console.WriteLine(result);
-                } else {
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    foreach (var diagnostic in diagnostics) {
+                if (!diagnostics.Any())
+                {
+                    Console.WriteLine(result.Value);
+                }
+                else
+                {
+                    foreach (var diagnostic in diagnostics)
+                    {
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine(diagnostic);
+                        Console.ResetColor();
+
+                        var prefix = line.Substring(0, diagnostic.Span.Start);
+                        var error = line.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
+                        var suffix = line.Substring(diagnostic.Span.End);
+
+                        Console.Write("    ");
+                        Console.Write(prefix);
+
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.Write(error);
+                        Console.ResetColor();
+                        Console.Write(suffix);
+                        Console.WriteLine();
                     }
+                    Console.WriteLine();
                     Console.ResetColor();
                 }
             }
         }
 
-        static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true) {
+        static void PrettyPrint(SyntaxNode node, string indent = "", bool isLast = true)
+        {
             var marker = isLast ? "└──" : "├──";
 
             Console.Write(indent);
             Console.Write(marker);
             Console.Write(node.Kind);
 
-            if (node is SyntaxToken t && t.Value != null) {
+            if (node is SyntaxToken t && t.Value != null)
+            {
                 Console.Write(" ");
                 Console.Write(t.Value);
             }
@@ -73,7 +101,8 @@ namespace Rocket
 
             var lastChild = node.GetChildren().LastOrDefault();
 
-            foreach (var child in node.GetChildren()) {
+            foreach (var child in node.GetChildren())
+            {
                 PrettyPrint(child, indent, child == lastChild);
             }
         }

@@ -2,9 +2,11 @@ using System.Collections.Generic;
 
 namespace Rocket.CodeAnalysis.Syntax
 {
-    public sealed class ParenthesizedExpressionSyntax: ExpressionSyntax {
+    public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
+    {
 
-        public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expression,SyntaxToken closeParanthesisToken) {
+        public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expression, SyntaxToken closeParanthesisToken)
+        {
             OpenParenthesisToken = openParenthesisToken;
             Expression = expression;
             CloseParanthesisToken = closeParanthesisToken;

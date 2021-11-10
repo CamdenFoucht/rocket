@@ -1,6 +1,7 @@
 namespace Rocket.CodeAnalysis.Syntax
 {
-    public enum SyntaxKind {
+    public enum SyntaxKind
+    {
         // Tokens
         BadToken,
         EndOfFileToken,
@@ -28,5 +29,8 @@ namespace Rocket.CodeAnalysis.Syntax
         UnaryExpression,
         EqualsEqualToken,
         BangEqualsToken,
+        NameExpression,
+        AssignmentExpression,
+        EqualsToken,
     }
 }

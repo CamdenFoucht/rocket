@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Rocket.CodeAnalysis.Compilation;
 
 namespace Rocket.CodeAnalysis.Syntax
 
@@ -12,24 +13,28 @@ namespace Rocket.CodeAnalysis.Syntax
 //
 
 {
-    internal sealed class Parser {
+    internal sealed class Parser
+    {
 
         private readonly SyntaxToken[] _tokens;
         private int _position;
 
-        private List<string> _diagnostics = new List<string>();
+        private DiagnosticBag _diagnostics = new DiagnosticBag();
 
-        public Parser(string text) {
+        public Parser(string text)
+        {
             var tokens = new List<SyntaxToken>();
 
             var lexer = new Lexer(text);
-            
+
             SyntaxToken token;
 
-            do {
+            do
+            {
                 token = lexer.Lex();
 
-                if (token.Kind != SyntaxKind.WhiteSpaceToken && token.Kind != SyntaxKind.BadToken) {
+                if (token.Kind != SyntaxKind.WhiteSpaceToken && token.Kind != SyntaxKind.BadToken)
+                {
                     tokens.Add(token);
                 }
 
@@ -40,64 +45,96 @@ namespace Rocket.CodeAnalysis.Syntax
             _diagnostics.AddRange(lexer.Diagnostic);
         }
 
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
-        private SyntaxToken Peek(int offset) {
+        private SyntaxToken Peek(int offset)
+        {
             var index = _position + offset;
-            if (index >= _tokens.Length) {
+            if (index >= _tokens.Length)
+            {
                 return _tokens[_tokens.Length - 1];
             }
             return _tokens[index];
         }
 
         private SyntaxToken Current => Peek(0);
-        private SyntaxToken NextToken() {
+        private SyntaxToken NextToken()
+        {
             var current = Current;
             _position++;
             return current;
         }
 
-        private SyntaxToken MatchToken(SyntaxKind kind) {
-            if (Current.Kind == kind) {
+        private SyntaxToken MatchToken(SyntaxKind kind)
+        {
+            if (Current.Kind == kind)
+            {
                 return NextToken();
             }
-            _diagnostics.Add($"ERROR: Unexpected token <{Current.Kind}>, expected <{kind}>");
+            _diagnostics.ReportUnexpectedToken(Current.Span, Current.Kind, kind);
             return new SyntaxToken(kind, Current.Position, null, null);
         }
 
-        public SyntaxTree Parse() {
+        public SyntaxTree Parse()
+        {
             var expression = ParseExpression();
             var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
             return new SyntaxTree(_diagnostics, expression, endOfFileToken);
         }
 
-        private ExpressionSyntax ParseExpression(int parentPrecedence = 0) {
+        private ExpressionSyntax ParseExpression()
+        {
+            return ParseAssignmentExpression();
+        }
+
+        private ExpressionSyntax ParseAssignmentExpression()
+        {
+            if (Peek(0).Kind == SyntaxKind.IdentifierToken &&
+                Peek(1).Kind == SyntaxKind.EqualsToken)
+            {
+                var identifierToken = NextToken();
+                var operatorToken = NextToken();
+                var right = ParseAssignmentExpression();
+                return new AssignmentExpressionSyntax(identifierToken, operatorToken, right);
+            }
+
+            return ParseBinaryExpression();
+        }
+
+        private ExpressionSyntax ParseBinaryExpression(int parentPrecedence = 0)
+        {
             ExpressionSyntax left;
 
             var unaryOperatorPrecedence = Current.Kind.GetUnaryOperatorPrecedence();
 
-            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence) {
+            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
+            {
                 var operatorToken = NextToken();
-                var operand = ParseExpression(unaryOperatorPrecedence);
+                var operand = ParseBinaryExpression(unaryOperatorPrecedence);
                 left = new UnaryExpressionSyntax(operatorToken, operand);
-            } else {
+            }
+            else
+            {
                 left = ParsePrimaryExpression();
             }
 
-            while (true) {
+            while (true)
+            {
                 var precedence = Current.Kind.GetBinaryOperatorPrecedence();
-                if (precedence == 0 || precedence <= parentPrecedence) {
+                if (precedence == 0 || precedence <= parentPrecedence)
+                {
                     break;
                 }
                 var operatorToken = NextToken();
-                var right = ParseExpression(precedence);
+                var right = ParseBinaryExpression(precedence);
                 left = new BinaryExpressionSyntax(left, operatorToken, right);
             }
 
             return left;
         }
 
-        private ExpressionSyntax ParsePrimaryExpression() {
+        private ExpressionSyntax ParsePrimaryExpression()
+        {
             switch (Current.Kind)
             {
                 case SyntaxKind.OpenParanthesisToken:
@@ -115,13 +152,18 @@ namespace Rocket.CodeAnalysis.Syntax
                         var value = keywordToken.Kind == SyntaxKind.TrueKeyword;
                         return new LiteralExpressionSyntax(keywordToken, value);
                     }
+                case SyntaxKind.IdentifierToken:
+                    {
+                        var identifierToken = NextToken();
+                        return new NameExpressionSyntax(identifierToken);
+                    }
 
                 default:
-                {
-                    var numberToken = MatchToken(SyntaxKind.NumberToken);
-                    return new LiteralExpressionSyntax(numberToken);
+                    {
+                        var numberToken = MatchToken(SyntaxKind.NumberToken);
+                        return new LiteralExpressionSyntax(numberToken);
 
-                }
+                    }
             }
         }
     }
