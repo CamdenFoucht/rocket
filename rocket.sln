@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rc", "rc\rc.csproj", "{1A062F43-53A3-4921-9CA9-DA8DD4F7D2F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rocket.Tests", "Rocket.Tests\Rocket.Tests.csproj", "{F5213213-31F5-4E96-AE8D-B625A72F358C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{1A062F43-53A3-4921-9CA9-DA8DD4F7D2F7}.Release|x64.Build.0 = Release|Any CPU
 		{1A062F43-53A3-4921-9CA9-DA8DD4F7D2F7}.Release|x86.ActiveCfg = Release|Any CPU
 		{1A062F43-53A3-4921-9CA9-DA8DD4F7D2F7}.Release|x86.Build.0 = Release|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Debug|x64.Build.0 = Debug|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Debug|x86.Build.0 = Debug|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Release|x64.ActiveCfg = Release|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Release|x64.Build.0 = Release|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5213213-31F5-4E96-AE8D-B625A72F358C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
