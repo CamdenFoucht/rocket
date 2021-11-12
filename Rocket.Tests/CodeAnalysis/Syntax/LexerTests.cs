@@ -6,7 +6,8 @@ using Xunit;
 
 namespace Rocket.Tests.CodeAnalysis.Syntax
 {
-    public class LexerText
+
+    public class LexerTests
     {
         [Theory]
         [MemberData(nameof(GetTokensData))]
@@ -162,7 +163,6 @@ namespace Rocket.Tests.CodeAnalysis.Syntax
             {
                 foreach (var t2 in GetTokens())
                 {
-
                     if (RequiresSeparator(t1.kind, t2.kind))
                     {
                         foreach (var s in GetSeparators())
